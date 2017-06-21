@@ -1,15 +1,16 @@
 import os
-import settings
-
-basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 class Config(object):
-    DEBUG = False
-    BROWSER = 'chrome'
     LOCAL_SELENIUM = False
 
 class LocalConfig(Config):
-    DEBUG = True
-    BROWSER = 'chrome'
     LOCAL_SELENIUM = True
+
+configs = {
+    'local': LocalConfig,
+    'prod': Config
+    }
+
+BROWSER = os.environ.get('BROWSER')
+APP_SETTINGS = configs.get(os.environ.get('TARGET'))
