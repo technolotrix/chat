@@ -13,7 +13,6 @@ WAIT = 3
 class BaseDriver():
 
     def __init__(self):
-
         self.browser = BROWSER
         # To run tests on your local machine
         self.run_local = APP_SETTINGS.LOCAL_SELENIUM
@@ -34,6 +33,7 @@ class BaseDriver():
         return drivers.get(browser)()
 
     def make_remote_driver(self, browser):
+        # For illustrative purposes only
         # Can DRY more
         drivers = {
             'firefox': {

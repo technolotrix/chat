@@ -1,0 +1,36 @@
+- What are the bugs in this app? Within the constraints of the app (1-1 chat, not a chatroom, not an app that manages multiple chats or group chats like iMessage), what are key pieces of functionality that this app still needs?
+
+Some of the bugs in the app include:
+Refreshing the page after logging in does not persist the chat session
+Ditto for back-browsing and forward-browsing
+Messages will not send if a comma is in the message (commas do not send at all)
+Sending extraordinarily long messages breaks the chat;  users cannot send new messages
+Some layout issues with long but non-breaking messages (no text wrapping)
+
+Key pieces of functionality still needed by the app include:
+Account creation
+Security features
+Log out
+Preventing duplicate sign-on names (using same name for both inputs on login)
+Persistent login (related to the aforementioned bugs above)
+Logs of chats
+Previous chat messages do not appear to user 2 if user 1 logs on and sends messages to user 2 before user 2 logs on.  Same thing if user 2 logs off and logs back on - all history is lost.
+Saving usernames/friends as a list of contacts
+
+- Suppose we decide to expand the functionality of the simple app to manage multiple chats at once. How would you recommend rolling out the change in a way that allows for thorough testing and minimizes disruption to users?
+
+This question is very broad and largely depends on the development team’s organization, and some of this is dependent on existing infrastructure.  For example, if a BDD/TDD approach is preferred or encouraged by the development team, I would expect unit tests to be written along with features.  Regardless of whichever method is used (assuming a basic Agile process), I would require functional tests to be written and automated prior to release.  Release candidates should contain incremental changes and should be tested, fixed, and iterated upon until all critical automated (and manual tests, where necessary) are passing.  Integration and regression testing should happen on some kind of intermediary environment (CI, staging, etc.) throughout the process.  Ideally, there would be an environment for release candidates that mimics production (something like a green/blue server setup).  Once a release candidate passes all tests and no regressions have been found, changes can be rolled out incrementally, repeating this process.  At minimum, the pre-release environment must mimic production, users will notice minimal downtime, since it doesn’t take long for DNS changes to propagate, and rollbacks are quick.
+
+- Older browsers do not support websockets. As such, the client needs to poll the server for new messages or events. The larger number of requests from these clients can potentially strain the system. How would you determine what a reasonable number of requests are for the system? How would you determine whether adding polling to the client would exceed that threshold?
+
+I would approach someone from Ops and see if it’s possible for me to set up servers for load testing and to gather data about how the application performs given current resource constraints.  I’d have these boxes mimic production as much as possible to minimize the number of changing variables.  I’d design and execute tests that make varying numbers of requests over different time periods and log the response times.  Effectively, I’d be running an experiment to see how many requests it takes to start seeing performance degradation, and after running these tests some number of times, I would plot and analyze the data to look for an obvious inflection point and see how many requests fall within () standard deviations to help find a reasonable upper bound.  (If I can’t have an environment that mimics production, I’d have to do further analysis, since we have too many variables that differ).  These tests would include different scenarios (a single chat between two people with many messages up to few messages at a time with many chat windows open).  To see if adding polling to the client exceeds said threshold, set up a second server where polling is the only client difference.  Repeat the same process and compare numbers.
+
+- Suppose that a large company has signed up to use the chat app a month from now. The system will suddenly need to support 1M conversations a day. How do you prepare?
+
+First, we need to know how the system performs now in order to understand how to approach the problem.  (In other words, going from 1000 messages a day to 1M is different than 100K to 1M).  After a gap/performance analysis, as a QA engineer, I would focus on making sure regression tests are up to date and accurately reporting test results so that my attention can be directed elsewhere.  Depending on resource constraints, I’d ideally want a few boxes set up to mimic production and perform some load testing.  If I were given serious resource constraints and had to choose between automating tests for new features or ensuring the application performs appropriately for future users (and revenue), I would focus on the 1M conversation rollout with continued performance and load testing.
+
+- In a small startup environment (~5 software engineers), how would you weigh the need to have high quality code against the need to move quickly? What practices would you implement to achieve the balance you think is right?
+
+Product owners (if there are any) should work with developers and QA to define small, iterable pieces of functionality that can be delivered within a sprint.  Smaller features can be tested and refactored quickly.  The keys here are prioritization and communication, which is why involvement between QA, product, developers, and, where necessary, input from Ops is crucial.  Efficient communication to sort out which pieces of functionality are critical versus desired, etc. needs to be balanced with the team’s workload (QA in particular, since it is historically a bottleneck for feature release).  Basically, an efficient planning process that focuses on communication and involves QA early in the process helps everyone agree on feature priority while balancing quality in a fast moving environment.
+
+
